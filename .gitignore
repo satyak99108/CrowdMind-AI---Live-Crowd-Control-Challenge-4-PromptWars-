@@ -1,3 +1,43 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Dependency directories
 node_modules/
+
+# Production build output
+dist/
+dist-ssr/
+build/
+
+# TypeScript build cache
+*.tsbuildinfo
+.tscache
+
+# Environment variables & secret files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# IDE / Editor configuration
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.sw?
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Temporary directories & internal docs
 CrowdMind_AI_Fan_MVP_Roadmap.docx
 ~$owdMind_AI_Fan_MVP_Roadmap.docx
+temp_*
