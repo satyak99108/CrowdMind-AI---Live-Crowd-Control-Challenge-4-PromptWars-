@@ -13,6 +13,17 @@ interface ChatMessage {
   metrics?: { label: string; value: string; color?: string }[];
 }
 
+function renderSafeMessageText(text: string) {
+  const escaped = (text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+  
+  return { __html: escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') };
+}
+
 export function CopilotChatWidget({ fullHeight = false }: { fullHeight?: boolean }) {
   const { stadiumData, fanProfile, forecastMode, recommendations } = useCrowd();
   const [messages, setMessages] = useState<ChatMessage[]>([
@@ -259,7 +270,7 @@ export function CopilotChatWidget({ fullHeight = false }: { fullHeight?: boolean
                     : "bg-card border border-border/80 text-foreground rounded-tl-none space-y-2.5"
                 )}
               >
-                <div dangerouslySetInnerHTML={{ __html: msg.text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }} />
+                <div dangerouslySetInnerHTML={renderSafeMessageText(msg.text)} />
 
                 {/* AI Extra Artifacts */}
                 {msg.sender === "ai" && msg.metrics && (

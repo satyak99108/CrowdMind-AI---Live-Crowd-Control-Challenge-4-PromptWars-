@@ -38,6 +38,24 @@ export function StadiumMap() {
     return gate.queueLength;
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent, item: Gate | Sector) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      setSelectedItem(item);
+    }
+  };
+
+  const getAriaLabel = (item: Gate | Sector) => {
+    const occupancy = getEffectiveOccupancy(item);
+    const pct = Math.round((occupancy / item.capacity) * 100);
+    const statusText = getEffectiveStatus(item);
+    if ("entryRate" in item) {
+      const q = getEffectiveQueue(item as Gate);
+      return `${item.name}. Status: ${statusText}. Occupancy: ${occupancy.toLocaleString()} of ${item.capacity.toLocaleString()} (${pct}%). Queue: ${q} fans.`;
+    }
+    return `${item.name}. Status: ${statusText}. Occupancy: ${occupancy.toLocaleString()} of ${item.capacity.toLocaleString()} (${pct}%).`;
+  };
+
   return (
     <div className="border border-border bg-card rounded-lg overflow-hidden flex flex-col shadow-sm">
       <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/20">
@@ -85,37 +103,53 @@ export function StadiumMap() {
             d="M 220 220 A 400 260 0 0 1 780 220 L 720 260 A 320 200 0 0 0 280 260 Z"
             fill={getStatusColor(getSector("sec-north-upper") ? getEffectiveStatus(getSector("sec-north-upper")!) : "low")}
             fillOpacity={0.65}
-            className="cursor-pointer transition-all hover:opacity-90"
+            className="cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-north-upper") && setSelectedItem(getSector("sec-north-upper")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-north-upper") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-north-upper") ? getAriaLabel(getSector("sec-north-upper")!) : "North Stand (Upper Tier)"}
+            onKeyDown={(e) => getSector("sec-north-upper") && handleKeyDown(e, getSector("sec-north-upper")!)}
           />
           <path
             d="M 220 540 A 400 260 0 0 0 780 540 L 720 500 A 320 200 0 0 1 280 500 Z"
             fill={getStatusColor(getSector("sec-south-upper") ? getEffectiveStatus(getSector("sec-south-upper")!) : "low")}
             fillOpacity={0.65}
-            className="cursor-pointer transition-all hover:opacity-90"
+            className="cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-south-upper") && setSelectedItem(getSector("sec-south-upper")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-south-upper") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-south-upper") ? getAriaLabel(getSector("sec-south-upper")!) : "South Stand (Upper Tier)"}
+            onKeyDown={(e) => getSector("sec-south-upper") && handleKeyDown(e, getSector("sec-south-upper")!)}
           />
           <path
             d="M 780 220 A 400 260 0 0 1 780 540 L 720 500 A 320 200 0 0 0 720 260 Z"
             fill={getStatusColor(getSector("sec-east-upper") ? getEffectiveStatus(getSector("sec-east-upper")!) : "low")}
             fillOpacity={0.65}
-            className="cursor-pointer transition-all hover:opacity-90"
+            className="cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-east-upper") && setSelectedItem(getSector("sec-east-upper")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-east-upper") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-east-upper") ? getAriaLabel(getSector("sec-east-upper")!) : "East Stand (Upper Tier)"}
+            onKeyDown={(e) => getSector("sec-east-upper") && handleKeyDown(e, getSector("sec-east-upper")!)}
           />
           <path
             d="M 220 220 A 400 260 0 0 0 220 540 L 280 500 A 320 200 0 0 1 280 260 Z"
             fill={getStatusColor(getSector("sec-west-upper") ? getEffectiveStatus(getSector("sec-west-upper")!) : "low")}
             fillOpacity={0.65}
-            className="cursor-pointer transition-all hover:opacity-90"
+            className="cursor-pointer transition-all hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-west-upper") && setSelectedItem(getSector("sec-west-upper")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-west-upper") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-west-upper") ? getAriaLabel(getSector("sec-west-upper")!) : "West Stand (Upper Tier)"}
+            onKeyDown={(e) => getSector("sec-west-upper") && handleKeyDown(e, getSector("sec-west-upper")!)}
           />
 
           <ellipse cx="500" cy="380" rx="310" ry="195" fill="none" stroke="hsl(var(--border))" strokeWidth="3" />
@@ -124,37 +158,53 @@ export function StadiumMap() {
             d="M 290 265 A 300 185 0 0 1 710 265 L 640 300 A 210 130 0 0 0 360 300 Z"
             fill={getStatusColor(getSector("sec-north-lower") ? getEffectiveStatus(getSector("sec-north-lower")!) : "low")}
             fillOpacity={0.8}
-            className="cursor-pointer transition-all hover:opacity-95"
+            className="cursor-pointer transition-all hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-north-lower") && setSelectedItem(getSector("sec-north-lower")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-north-lower") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-north-lower") ? getAriaLabel(getSector("sec-north-lower")!) : "North Stand (Lower Tier)"}
+            onKeyDown={(e) => getSector("sec-north-lower") && handleKeyDown(e, getSector("sec-north-lower")!)}
           />
           <path
             d="M 290 495 A 300 185 0 0 0 710 495 L 640 460 A 210 130 0 0 1 360 460 Z"
             fill={getStatusColor(getSector("sec-south-lower") ? getEffectiveStatus(getSector("sec-south-lower")!) : "low")}
             fillOpacity={0.8}
-            className="cursor-pointer transition-all hover:opacity-95"
+            className="cursor-pointer transition-all hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-south-lower") && setSelectedItem(getSector("sec-south-lower")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-south-lower") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-south-lower") ? getAriaLabel(getSector("sec-south-lower")!) : "South Stand (Lower Tier)"}
+            onKeyDown={(e) => getSector("sec-south-lower") && handleKeyDown(e, getSector("sec-south-lower")!)}
           />
           <path
             d="M 710 265 A 300 185 0 0 1 710 495 L 640 460 A 210 130 0 0 0 640 300 Z"
             fill={getStatusColor(getSector("sec-east-lower") ? getEffectiveStatus(getSector("sec-east-lower")!) : "low")}
             fillOpacity={0.8}
-            className="cursor-pointer transition-all hover:opacity-95"
+            className="cursor-pointer transition-all hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-east-lower") && setSelectedItem(getSector("sec-east-lower")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-east-lower") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-east-lower") ? getAriaLabel(getSector("sec-east-lower")!) : "East Stand (Lower Tier)"}
+            onKeyDown={(e) => getSector("sec-east-lower") && handleKeyDown(e, getSector("sec-east-lower")!)}
           />
           <path
             d="M 290 265 A 300 185 0 0 0 290 495 L 360 460 A 210 130 0 0 1 360 300 Z"
             fill={getStatusColor(getSector("sec-west-lower") ? getEffectiveStatus(getSector("sec-west-lower")!) : "low")}
             fillOpacity={0.8}
-            className="cursor-pointer transition-all hover:opacity-95"
+            className="cursor-pointer transition-all hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background rounded"
             onClick={() => getSector("sec-west-lower") && setSelectedItem(getSector("sec-west-lower")!)}
             onMouseEnter={() => setHoveredSector(getSector("sec-west-lower") || null)}
             onMouseLeave={() => setHoveredSector(null)}
+            tabIndex={0}
+            role="button"
+            aria-label={getSector("sec-west-lower") ? getAriaLabel(getSector("sec-west-lower")!) : "West Stand (Lower Tier)"}
+            onKeyDown={(e) => getSector("sec-west-lower") && handleKeyDown(e, getSector("sec-west-lower")!)}
           />
 
           <rect x="375" y="310" width="250" height="140" rx="8" fill="#047857" stroke="#10b981" strokeWidth="2" />
@@ -176,11 +226,15 @@ export function StadiumMap() {
             return (
               <g
                 key={gate.id}
-                className="cursor-pointer group"
+                className="cursor-pointer group focus:outline-none"
                 transform={`translate(${gate.coords.x}, ${gate.coords.y})`}
                 onClick={() => setSelectedItem(gate)}
                 onMouseEnter={() => setHoveredSector(gate)}
                 onMouseLeave={() => setHoveredSector(null)}
+                tabIndex={0}
+                role="button"
+                aria-label={getAriaLabel(gate)}
+                onKeyDown={(e) => handleKeyDown(e, gate)}
               >
                 {status === "high" && (
                   <circle cx="0" cy="0" r="38" fill="rgba(239,68,68,0.25)" className="animate-ping" />

@@ -50,7 +50,7 @@ export function SidebarContent({ collapsed = false, onNavigate }: { collapsed?: 
         )}
       </div>
 
-      <nav className="flex-1 py-2 px-2 space-y-1">
+      <nav aria-label="Primary Navigation" className="flex-1 py-2 px-2 space-y-1">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path || 
             (item.path !== "/" && location.pathname.startsWith(item.path));
@@ -67,7 +67,7 @@ export function SidebarContent({ collapsed = false, onNavigate }: { collapsed?: 
                   : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
               )}
             >
-              <item.icon className={cn("h-4 w-4 shrink-0 transition-transform group-hover:scale-105", isActive ? "text-primary" : "text-muted-foreground")} />
+              <item.icon aria-hidden="true" className={cn("h-4 w-4 shrink-0 transition-transform group-hover:scale-105", isActive ? "text-primary" : "text-muted-foreground")} />
               {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
 
               {!collapsed && item.path === "/recommendations" && activeRecsCount > 0 && (

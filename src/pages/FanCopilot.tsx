@@ -126,8 +126,9 @@ export default function FanCopilot() {
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
             {/* Target Seat Section */}
             <div className="space-y-1">
-              <label className="text-[10px] font-mono text-muted-foreground uppercase">Ticket Section</label>
+              <label htmlFor="ticket-section-select" className="text-[10px] font-mono text-muted-foreground uppercase">Ticket Section</label>
               <select
+                id="ticket-section-select"
                 value={fanProfile.seatSection}
                 onChange={(e) => updateFanProfile({ seatSection: e.target.value })}
                 className="w-full bg-muted/50 border border-border rounded-md px-2.5 py-1.5 text-xs text-foreground font-medium focus:outline-none focus:ring-1 focus:ring-primary"
@@ -142,8 +143,9 @@ export default function FanCopilot() {
 
             {/* Preferred Gate */}
             <div className="space-y-1">
-              <label className="text-[10px] font-mono text-muted-foreground uppercase">Nearby / Preferred Gate</label>
+              <label htmlFor="preferred-gate-select" className="text-[10px] font-mono text-muted-foreground uppercase">Nearby / Preferred Gate</label>
               <select
+                id="preferred-gate-select"
                 value={fanProfile.preferredGateId}
                 onChange={(e) => updateFanProfile({ preferredGateId: e.target.value })}
                 className="w-full bg-muted/50 border border-border rounded-md px-2.5 py-1.5 text-xs text-foreground font-medium focus:outline-none focus:ring-1 focus:ring-primary"
@@ -158,8 +160,8 @@ export default function FanCopilot() {
 
             {/* Transit Mode */}
             <div className="space-y-1">
-              <label className="text-[10px] font-mono text-muted-foreground uppercase">Transit Mode</label>
-              <div className="grid grid-cols-4 gap-1">
+              <label id="transit-mode-label" className="text-[10px] font-mono text-muted-foreground uppercase">Transit Mode</label>
+              <div role="group" aria-labelledby="transit-mode-label" className="grid grid-cols-4 gap-1">
                 {[
                   { id: "metro", icon: Train, label: "Metro" },
                   { id: "uber", icon: Car, label: "Uber" },
@@ -169,6 +171,7 @@ export default function FanCopilot() {
                   <button
                     key={item.id}
                     onClick={() => updateFanProfile({ transitMode: item.id as any })}
+                    aria-pressed={fanProfile.transitMode === item.id}
                     className={cn(
                       "flex flex-col items-center justify-center p-1.5 rounded border text-[10px] transition-all",
                       fanProfile.transitMode === item.id
@@ -176,7 +179,7 @@ export default function FanCopilot() {
                         : "bg-muted/30 border-border text-muted-foreground hover:bg-muted"
                     )}
                   >
-                    <item.icon className="h-3.5 w-3.5 mb-0.5" />
+                    <item.icon className="h-3.5 w-3.5 mb-0.5" aria-hidden="true" />
                     <span>{item.label}</span>
                   </button>
                 ))}
@@ -185,8 +188,9 @@ export default function FanCopilot() {
 
             {/* Match Phase */}
             <div className="space-y-1">
-              <label className="text-[10px] font-mono text-muted-foreground uppercase">Stadium Journey Phase</label>
+              <label htmlFor="journey-phase-select" className="text-[10px] font-mono text-muted-foreground uppercase">Stadium Journey Phase</label>
               <select
+                id="journey-phase-select"
                 value={fanProfile.matchPhase}
                 onChange={(e) => updateFanProfile({ matchPhase: e.target.value as any })}
                 className="w-full bg-muted/50 border border-border rounded-md px-2.5 py-1.5 text-xs text-foreground font-medium focus:outline-none focus:ring-1 focus:ring-primary"

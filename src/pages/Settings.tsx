@@ -79,18 +79,18 @@ export default function Settings() {
             <div className="space-y-4 text-xs">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-foreground">Automated Incident Generation</p>
+                  <label htmlFor="auto-incident-switch" className="font-semibold text-foreground cursor-pointer">Automated Incident Generation</label>
                   <p className="text-muted-foreground text-[11px]">Automatically log critical incident when gate occupancy &gt;85%</p>
                 </div>
-                <Switch defaultChecked />
+                <Switch id="auto-incident-switch" defaultChecked />
               </div>
 
               <div className="flex items-center justify-between pt-3 border-t border-border/50">
                 <div>
-                  <p className="font-semibold text-foreground">Sound & Visual Flash Alerts</p>
+                  <label htmlFor="flash-alerts-switch" className="font-semibold text-foreground cursor-pointer">Sound & Visual Flash Alerts</label>
                   <p className="text-muted-foreground text-[11px]">Trigger pulsing red aura on stadium heatmap during bottlenecks</p>
                 </div>
-                <Switch defaultChecked />
+                <Switch id="flash-alerts-switch" defaultChecked />
               </div>
             </div>
           </div>
