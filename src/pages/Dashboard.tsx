@@ -57,7 +57,7 @@ export default function Dashboard() {
                 size="sm"
                 className="h-8 text-[12px] gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium shadow-sm"
               >
-                <Bot className="h-3.5 w-3.5" /> Launch Fan Copilot (MVP 4)
+                <Bot className="h-3.5 w-3.5" /> Launch Fan Copilot
               </Button>
             </Link>
             <Button

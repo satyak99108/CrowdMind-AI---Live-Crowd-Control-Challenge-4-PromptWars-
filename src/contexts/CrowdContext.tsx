@@ -512,7 +512,7 @@ export const CrowdProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [logs, setLogs] = useState<LogEntry[]>([
     { id: 1, timestamp: new Date().toLocaleTimeString(), type: "SYSTEM", message: "CrowdMind AI Telemetry & Predictive AI Engine Online" },
     { id: 2, timestamp: new Date().toLocaleTimeString(), type: "PREDICTION", message: "AI Prediction Engine: 5m & 10m crowd forecasting active" },
-    { id: 3, timestamp: new Date().toLocaleTimeString(), type: "RECOMMENDATION", message: "MVP 3 Generative AI Recommendation Engine ready" }
+    { id: 3, timestamp: new Date().toLocaleTimeString(), type: "RECOMMENDATION", message: "Generative AI Recommendation Engine ready" }
   ]);
   const [incidents, setIncidents] = useState<Incident[]>(INITIAL_INCIDENTS);
   const [recommendations, setRecommendations] = useState<Recommendation[]>(INITIAL_RECOMMENDATIONS);

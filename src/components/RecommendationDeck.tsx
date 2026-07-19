@@ -26,7 +26,7 @@ export function RecommendationDeck() {
             <h2 className="text-sm font-bold flex items-center gap-2">
               AI Actionable Recommendations Engine
               <span className="text-[10px] font-mono font-normal px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
-                MVP 3 TRANSPARENCY
+                AI TRANSPARENCY
               </span>
             </h2>
             <p className="text-[11px] text-muted-foreground">

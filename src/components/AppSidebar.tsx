@@ -7,7 +7,7 @@ import { useCrowd } from "../contexts/CrowdContext";
 
 export const navItems = [
   { icon: LayoutDashboard, label: "Live Telemetry", path: "/dashboard" },
-  { icon: Bot, label: "Fan Copilot (MVP 4)", path: "/copilot" },
+  { icon: Bot, label: "Fan Copilot", path: "/copilot" },
   { icon: Sparkles, label: "AI Recommendations", path: "/recommendations" },
   { icon: Grid, label: "Gates & Sectors", path: "/gates" },
   { icon: AlertTriangle, label: "Incident Triage", path: "/incidents" },

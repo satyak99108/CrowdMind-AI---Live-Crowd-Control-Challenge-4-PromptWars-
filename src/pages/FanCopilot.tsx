@@ -89,7 +89,7 @@ export default function FanCopilot() {
           <div>
             <div className="flex items-center gap-2">
               <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                MVP 4 ACTIVE
+                FAN COPILOT ACTIVE
               </span>
               <h1 className="text-sm font-bold tracking-tight text-foreground flex items-center gap-1.5">
                 Personalized Fan Copilot

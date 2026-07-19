@@ -24,7 +24,7 @@ export function PredictiveForecastBar() {
             <div className="flex items-center gap-2">
               <span className="text-xs font-bold font-mono uppercase tracking-wider">AI Predictive Crowd Horizon</span>
               <span className="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] font-mono bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                <Sparkles className="h-3 w-3 mr-1" /> MVP 2 FORECASTING
+                <Sparkles className="h-3 w-3 mr-1" /> PREDICTIVE FORECASTING
               </span>
             </div>
             <p className="text-[11px] text-muted-foreground">Select forecast timeline mode to project gate & sector density ahead of real-time</p>
