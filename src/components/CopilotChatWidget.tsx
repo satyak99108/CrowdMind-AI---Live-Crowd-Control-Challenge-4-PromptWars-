@@ -14,14 +14,13 @@ interface ChatMessage {
 }
 
 function renderSafeMessageText(text: string) {
-  const escaped = (text || "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-  
-  return { __html: escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') };
+  const parts = (text || "").split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    return <React.Fragment key={index}>{part}</React.Fragment>;
+  });
 }
 
 export function CopilotChatWidget({ fullHeight = false }: { fullHeight?: boolean }) {
@@ -168,7 +167,7 @@ export function CopilotChatWidget({ fullHeight = false }: { fullHeight?: boolean
       text: `I've analyzed live stadium sensors for your query "${userQuestion}". All major zones are currently operating under real-time predictive monitoring.`,
       timestamp: now,
       reasoning: `Matched against stadium data for ${stadiumData.stadiumName}. 8 Gates and 12 Sectors active.`,
-      actionableTip: "You can ask about food queues, restroom wait times, best entry gates, or smart exit routes!",
+      actionableTip: "You can ask about food queues, restrooms, entry gates, or smart exit routes!",
       metrics: [
         { label: "System Status", value: "Live Monitoring", color: "emerald" },
         { label: "Stadium Status", value: stadiumData.matchInfo.status, color: "indigo" }
@@ -270,7 +269,7 @@ export function CopilotChatWidget({ fullHeight = false }: { fullHeight?: boolean
                     : "bg-card border border-border/80 text-foreground rounded-tl-none space-y-2.5"
                 )}
               >
-                <div dangerouslySetInnerHTML={renderSafeMessageText(msg.text)} />
+                <div>{renderSafeMessageText(msg.text)}</div>
 
                 {/* AI Extra Artifacts */}
                 {msg.sender === "ai" && msg.metrics && (
