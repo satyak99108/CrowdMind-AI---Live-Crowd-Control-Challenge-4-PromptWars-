@@ -4,23 +4,14 @@ import { AppLayout } from "../components/AppLayout";
 import { CopilotChatWidget } from "../components/CopilotChatWidget";
 import { SeatWayfinderMap } from "../components/SeatWayfinderMap";
 import { 
-  Sparkles, 
-  MapPin, 
-  Navigation, 
   Utensils, 
   DoorOpen, 
   LogOut, 
   Clock, 
-  ShieldCheck, 
-  Zap, 
   Train, 
   Car, 
   Bus, 
-  Ticket, 
-  CheckCircle2, 
-  TrendingDown, 
-  AlertCircle,
-  HelpCircle
+  Ticket 
 } from "lucide-react";
 import { cn } from "../lib/utils";
 

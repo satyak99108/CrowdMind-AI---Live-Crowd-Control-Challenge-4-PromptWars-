@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useCrowd } from "../contexts/CrowdContext";
-import { Sparkles, Send, Bot, User, ArrowRight, ShieldCheck, Zap, HelpCircle, Clock, MapPin, RefreshCw } from "lucide-react";
+import { Sparkles, Send, Bot, User, ShieldCheck, Zap, RefreshCw } from "lucide-react";
 import { cn } from "../lib/utils";
 
 interface ChatMessage {

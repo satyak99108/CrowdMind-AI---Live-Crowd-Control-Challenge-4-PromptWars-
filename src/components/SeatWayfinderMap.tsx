@@ -1,7 +1,6 @@
 import React from "react";
 import { useCrowd } from "../contexts/CrowdContext";
-import { Navigation, Footprints, Clock, ShieldCheck, MapPin, CheckCircle2, ChevronRight } from "lucide-react";
-import { cn } from "../lib/utils";
+import { Navigation } from "lucide-react";
 
 export function SeatWayfinderMap() {
   const { fanProfile, stadiumData } = useCrowd();

@@ -8,7 +8,7 @@ import { ZoneDetailModal } from "../components/ZoneDetailModal";
 import { PredictiveForecastBar } from "../components/PredictiveForecastBar";
 import { PredictiveQueueCard } from "../components/PredictiveQueueCard";
 import { RecommendationDeck } from "../components/RecommendationDeck";
-import { Users, AlertTriangle, TrendingUp, Zap, Sparkles, Layers, Activity, Bot, ArrowRight } from "lucide-react";
+import { Users, AlertTriangle, TrendingUp, Zap, Sparkles, Layers, Activity, Bot } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Link } from "react-router-dom";
 import { cn } from "../lib/utils";
