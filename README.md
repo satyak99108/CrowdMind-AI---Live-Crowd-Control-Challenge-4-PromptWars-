@@ -1,10 +1,11 @@
 # CrowdMind-AI---Live-Crowd-Control-Challenge-4-PromptWars-
 
-Step-by-Step Execution Guide
-Prerequisites
+<pre>
+<h3>Step-by-Step Execution Guide</h3>
+<h4>Prerequisites</h4>
 The user must have Node.js (v18 or higher) and npm installed on their computer.
 
-Step 1: Clone the Repository
+Step 1: Clone the Repository<br>
 Clone the remote GitHub repository to their local computer:
 <i>git clone https://github.com/satyak99108/CrowdMind-AI---Live-Crowd-Control-Challenge-4-PromptWars-.git</i>
 <br>
@@ -29,3 +30,4 @@ If someone wants to generate an optimized production build:
 <i>npm run build</i>
 Preview Production Build:
 <i>npm run preview</i>
+</pre>
