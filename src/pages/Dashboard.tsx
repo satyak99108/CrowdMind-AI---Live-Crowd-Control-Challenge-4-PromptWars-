@@ -8,8 +8,9 @@ import { ZoneDetailModal } from "../components/ZoneDetailModal";
 import { PredictiveForecastBar } from "../components/PredictiveForecastBar";
 import { PredictiveQueueCard } from "../components/PredictiveQueueCard";
 import { RecommendationDeck } from "../components/RecommendationDeck";
-import { Users, AlertTriangle, TrendingUp, Zap, Sparkles, Layers, Activity } from "lucide-react";
+import { Users, AlertTriangle, TrendingUp, Zap, Sparkles, Layers, Activity, Bot, ArrowRight } from "lucide-react";
 import { Button } from "../components/ui/button";
+import { Link } from "react-router-dom";
 import { cn } from "../lib/utils";
 
 export default function Dashboard() {
@@ -50,6 +51,15 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-2">
+            <Link to="/copilot">
+              <Button
+                variant="default"
+                size="sm"
+                className="h-8 text-[12px] gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white font-medium shadow-sm"
+              >
+                <Bot className="h-3.5 w-3.5" /> Launch Fan Copilot (MVP 4)
+              </Button>
+            </Link>
             <Button
               variant="outline"
               size="sm"

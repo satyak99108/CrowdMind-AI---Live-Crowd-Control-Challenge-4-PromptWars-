@@ -1,4 +1,4 @@
-import { LayoutDashboard, Grid, AlertTriangle, BarChart3, Settings, Activity, Sparkles } from "lucide-react";
+import { LayoutDashboard, Grid, AlertTriangle, BarChart3, Settings, Activity, Sparkles, Bot } from "lucide-react";
 import { StackedLogo } from "./StackedLogo";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
@@ -7,6 +7,7 @@ import { useCrowd } from "../contexts/CrowdContext";
 
 export const navItems = [
   { icon: LayoutDashboard, label: "Live Telemetry", path: "/dashboard" },
+  { icon: Bot, label: "Fan Copilot (MVP 4)", path: "/copilot" },
   { icon: Sparkles, label: "AI Recommendations", path: "/recommendations" },
   { icon: Grid, label: "Gates & Sectors", path: "/gates" },
   { icon: AlertTriangle, label: "Incident Triage", path: "/incidents" },

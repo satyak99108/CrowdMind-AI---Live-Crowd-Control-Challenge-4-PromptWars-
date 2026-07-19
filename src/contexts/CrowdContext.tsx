@@ -448,6 +448,28 @@ export const INITIAL_RECOMMENDATIONS: Recommendation[] = [
   }
 ];
 
+export interface FanProfile {
+  seatSection: string;
+  seatRow: string;
+  seatNumber: string;
+  ticketCategory: string;
+  transitMode: "metro" | "uber" | "car" | "bus";
+  matchPhase: "entry" | "in_seat" | "halftime" | "exit";
+  preferredGateId: string;
+  accessibilityNeeded: boolean;
+}
+
+export const INITIAL_FAN_PROFILE: FanProfile = {
+  seatSection: "sec-north-upper",
+  seatRow: "Row 14",
+  seatNumber: "Seat 22",
+  ticketCategory: "Category 1 - Upper Stand",
+  transitMode: "metro",
+  matchPhase: "entry",
+  preferredGateId: "gate-a",
+  accessibilityNeeded: false,
+};
+
 interface CrowdContextType {
   stadiumData: StadiumData;
   simState: {
@@ -472,6 +494,8 @@ interface CrowdContextType {
   addIncident: (newInc: Partial<Incident>) => void;
   executeRecommendation: (id: string) => void;
   dismissRecommendation: (id: string) => void;
+  fanProfile: FanProfile;
+  updateFanProfile: (updates: Partial<FanProfile>) => void;
 }
 
 const CrowdContext = createContext<CrowdContextType | undefined>(undefined);
@@ -493,6 +517,11 @@ export const CrowdProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [incidents, setIncidents] = useState<Incident[]>(INITIAL_INCIDENTS);
   const [recommendations, setRecommendations] = useState<Recommendation[]>(INITIAL_RECOMMENDATIONS);
   const [selectedItem, setSelectedItem] = useState<Gate | Sector | Amenity | null>(null);
+  const [fanProfile, setFanProfile] = useState<FanProfile>(INITIAL_FAN_PROFILE);
+
+  const updateFanProfile = (updates: Partial<FanProfile>) => {
+    setFanProfile((prev) => ({ ...prev, ...updates }));
+  };
 
   const speedRef = useRef(1);
   const scenarioRef = useRef("PRE_MATCH");
@@ -758,7 +787,9 @@ export const CrowdProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         updateIncidentStatus,
         addIncident,
         executeRecommendation,
-        dismissRecommendation
+        dismissRecommendation,
+        fanProfile,
+        updateFanProfile
       }}
     >
       {children}

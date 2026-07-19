@@ -4,7 +4,11 @@ jspm_packages/
 web_modules/
 .npm/
 .yarn/
-.yarn-integrity
+.pnpm-store/
+.pnpm/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 *.tgz
 
 # Logs

@@ -9,6 +9,7 @@ import { SmoothScroll } from "./components/SmoothScroll";
 
 import Landing from "./pages/Landing";
 import Dashboard from "./pages/Dashboard";
+import FanCopilot from "./pages/FanCopilot";
 import Recommendations from "./pages/Recommendations";
 import GatesMatrix from "./pages/GatesMatrix";
 import IncidentTriage from "./pages/IncidentTriage";
@@ -31,6 +32,7 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/copilot" element={<FanCopilot />} />
                 <Route path="/recommendations" element={<Recommendations />} />
                 <Route path="/gates" element={<GatesMatrix />} />
                 <Route path="/incidents" element={<IncidentTriage />} />
