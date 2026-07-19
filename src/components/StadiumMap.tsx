@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useCrowd, Gate, Sector } from "../contexts/CrowdContext";
-import { Layers, Info } from "lucide-react";
+import { Layers, Info, Sparkles, Clock } from "lucide-react";
 
 export function getStatusColor(status: "low" | "moderate" | "high") {
   switch (status) {
@@ -15,10 +15,28 @@ export function getStatusColor(status: "low" | "moderate" | "high") {
 }
 
 export function StadiumMap() {
-  const { stadiumData, selectedItem, setSelectedItem } = useCrowd();
+  const { stadiumData, selectedItem, setSelectedItem, forecastMode } = useCrowd();
   const [hoveredSector, setHoveredSector] = useState<Gate | Sector | null>(null);
 
   const getSector = (id: string) => stadiumData.sectors.find((s) => s.id === id);
+
+  const getEffectiveStatus = (item: Gate | Sector) => {
+    if (forecastMode === "+5MIN") return item.predictedStatus5m;
+    if (forecastMode === "+10MIN") return item.predictedStatus10m;
+    return item.status;
+  };
+
+  const getEffectiveOccupancy = (item: Gate | Sector) => {
+    if (forecastMode === "+5MIN") return item.predictedOccupancy5m;
+    if (forecastMode === "+10MIN") return item.predictedOccupancy10m;
+    return item.currentOccupancy;
+  };
+
+  const getEffectiveQueue = (gate: Gate) => {
+    if (forecastMode === "+5MIN") return gate.predictedQueue5m;
+    if (forecastMode === "+10MIN") return gate.predictedQueue10m;
+    return gate.queueLength;
+  };
 
   return (
     <div className="border border-border bg-card rounded-lg overflow-hidden flex flex-col shadow-sm">
@@ -26,6 +44,11 @@ export function StadiumMap() {
         <div className="flex items-center gap-2">
           <Layers className="h-4 w-4 text-primary" />
           <span className="text-[13px] font-medium">Interactive Stadium Heatmap Visualizer</span>
+          {forecastMode !== "NOW" && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+              <Sparkles className="h-3 w-3" /> {forecastMode} PREVIEW
+            </span>
+          )}
         </div>
 
         <div className="flex items-center gap-4 text-[11px] text-muted-foreground">
@@ -57,9 +80,10 @@ export function StadiumMap() {
           <ellipse cx="500" cy="380" rx="460" ry="320" fill="hsl(var(--card))" stroke="hsl(var(--border))" strokeWidth="2" />
           <ellipse cx="500" cy="380" rx="410" ry="275" fill="none" stroke="hsl(var(--primary) / 0.2)" strokeWidth="18" strokeDasharray="10 8" />
 
+          {/* Sectors */}
           <path
             d="M 220 220 A 400 260 0 0 1 780 220 L 720 260 A 320 200 0 0 0 280 260 Z"
-            fill={getStatusColor(getSector("sec-north-upper")?.status || "low")}
+            fill={getStatusColor(getSector("sec-north-upper") ? getEffectiveStatus(getSector("sec-north-upper")!) : "low")}
             fillOpacity={0.65}
             className="cursor-pointer transition-all hover:opacity-90"
             onClick={() => getSector("sec-north-upper") && setSelectedItem(getSector("sec-north-upper")!)}
@@ -68,7 +92,7 @@ export function StadiumMap() {
           />
           <path
             d="M 220 540 A 400 260 0 0 0 780 540 L 720 500 A 320 200 0 0 1 280 500 Z"
-            fill={getStatusColor(getSector("sec-south-upper")?.status || "low")}
+            fill={getStatusColor(getSector("sec-south-upper") ? getEffectiveStatus(getSector("sec-south-upper")!) : "low")}
             fillOpacity={0.65}
             className="cursor-pointer transition-all hover:opacity-90"
             onClick={() => getSector("sec-south-upper") && setSelectedItem(getSector("sec-south-upper")!)}
@@ -77,7 +101,7 @@ export function StadiumMap() {
           />
           <path
             d="M 780 220 A 400 260 0 0 1 780 540 L 720 500 A 320 200 0 0 0 720 260 Z"
-            fill={getStatusColor(getSector("sec-east-upper")?.status || "low")}
+            fill={getStatusColor(getSector("sec-east-upper") ? getEffectiveStatus(getSector("sec-east-upper")!) : "low")}
             fillOpacity={0.65}
             className="cursor-pointer transition-all hover:opacity-90"
             onClick={() => getSector("sec-east-upper") && setSelectedItem(getSector("sec-east-upper")!)}
@@ -86,7 +110,7 @@ export function StadiumMap() {
           />
           <path
             d="M 220 220 A 400 260 0 0 0 220 540 L 280 500 A 320 200 0 0 1 280 260 Z"
-            fill={getStatusColor(getSector("sec-west-upper")?.status || "low")}
+            fill={getStatusColor(getSector("sec-west-upper") ? getEffectiveStatus(getSector("sec-west-upper")!) : "low")}
             fillOpacity={0.65}
             className="cursor-pointer transition-all hover:opacity-90"
             onClick={() => getSector("sec-west-upper") && setSelectedItem(getSector("sec-west-upper")!)}
@@ -98,7 +122,7 @@ export function StadiumMap() {
 
           <path
             d="M 290 265 A 300 185 0 0 1 710 265 L 640 300 A 210 130 0 0 0 360 300 Z"
-            fill={getStatusColor(getSector("sec-north-lower")?.status || "low")}
+            fill={getStatusColor(getSector("sec-north-lower") ? getEffectiveStatus(getSector("sec-north-lower")!) : "low")}
             fillOpacity={0.8}
             className="cursor-pointer transition-all hover:opacity-95"
             onClick={() => getSector("sec-north-lower") && setSelectedItem(getSector("sec-north-lower")!)}
@@ -107,7 +131,7 @@ export function StadiumMap() {
           />
           <path
             d="M 290 495 A 300 185 0 0 0 710 495 L 640 460 A 210 130 0 0 1 360 460 Z"
-            fill={getStatusColor(getSector("sec-south-lower")?.status || "low")}
+            fill={getStatusColor(getSector("sec-south-lower") ? getEffectiveStatus(getSector("sec-south-lower")!) : "low")}
             fillOpacity={0.8}
             className="cursor-pointer transition-all hover:opacity-95"
             onClick={() => getSector("sec-south-lower") && setSelectedItem(getSector("sec-south-lower")!)}
@@ -116,7 +140,7 @@ export function StadiumMap() {
           />
           <path
             d="M 710 265 A 300 185 0 0 1 710 495 L 640 460 A 210 130 0 0 0 640 300 Z"
-            fill={getStatusColor(getSector("sec-east-lower")?.status || "low")}
+            fill={getStatusColor(getSector("sec-east-lower") ? getEffectiveStatus(getSector("sec-east-lower")!) : "low")}
             fillOpacity={0.8}
             className="cursor-pointer transition-all hover:opacity-95"
             onClick={() => getSector("sec-east-lower") && setSelectedItem(getSector("sec-east-lower")!)}
@@ -125,7 +149,7 @@ export function StadiumMap() {
           />
           <path
             d="M 290 265 A 300 185 0 0 0 290 495 L 360 460 A 210 130 0 0 1 360 300 Z"
-            fill={getStatusColor(getSector("sec-west-lower")?.status || "low")}
+            fill={getStatusColor(getSector("sec-west-lower") ? getEffectiveStatus(getSector("sec-west-lower")!) : "low")}
             fillOpacity={0.8}
             className="cursor-pointer transition-all hover:opacity-95"
             onClick={() => getSector("sec-west-lower") && setSelectedItem(getSector("sec-west-lower")!)}
@@ -142,8 +166,11 @@ export function StadiumMap() {
             LUSAIL FIELD
           </text>
 
+          {/* Gates */}
           {stadiumData.gates.map((gate) => {
-            const color = getStatusColor(gate.status);
+            const status = getEffectiveStatus(gate);
+            const color = getStatusColor(status);
+            const queue = getEffectiveQueue(gate);
             const isSelected = selectedItem?.id === gate.id;
 
             return (
@@ -155,7 +182,7 @@ export function StadiumMap() {
                 onMouseEnter={() => setHoveredSector(gate)}
                 onMouseLeave={() => setHoveredSector(null)}
               >
-                {gate.status === "high" && (
+                {status === "high" && (
                   <circle cx="0" cy="0" r="38" fill="rgba(239,68,68,0.25)" className="animate-ping" />
                 )}
 
@@ -167,7 +194,7 @@ export function StadiumMap() {
                   stroke={isSelected ? "hsl(var(--primary))" : "#ffffff"}
                   strokeWidth={isSelected ? 4 : 2}
                   className="transition-transform group-hover:scale-110"
-                  filter={gate.status === "high" ? "url(#glow-red)" : "none"}
+                  filter={status === "high" ? "url(#glow-red)" : "none"}
                 />
 
                 <text x="0" y="4" textAnchor="middle" fill="#ffffff" fontSize="13" fontWeight="800">
@@ -176,7 +203,7 @@ export function StadiumMap() {
 
                 <rect x="-20" y="24" width="40" height="16" rx="4" fill="hsl(var(--background))" stroke={color} strokeWidth="1.5" />
                 <text x="0" y="35" textAnchor="middle" fill="hsl(var(--foreground))" fontSize="9" fontWeight="700" className="font-mono">
-                  {gate.queueLength}q
+                  {queue}q
                 </text>
               </g>
             );
@@ -184,30 +211,36 @@ export function StadiumMap() {
         </svg>
 
         {hoveredSector && (
-          <div className="absolute bottom-4 left-4 z-20 bg-background/95 backdrop-blur border border-border p-3 rounded-lg shadow-xl text-xs space-y-1 min-w-[200px]">
-            <p className="font-semibold text-[13px]" style={{ color: getStatusColor(hoveredSector.status) }}>
-              {hoveredSector.name}
-            </p>
+          <div className="absolute bottom-4 left-4 z-20 bg-background/95 backdrop-blur border border-border p-3 rounded-lg shadow-xl text-xs space-y-1 min-w-[220px]">
+            <div className="flex justify-between items-center">
+              <p className="font-semibold text-[13px]" style={{ color: getStatusColor(getEffectiveStatus(hoveredSector)) }}>
+                {hoveredSector.name}
+              </p>
+              <span className="text-[10px] font-mono text-muted-foreground uppercase">{forecastMode}</span>
+            </div>
+
             <div className="flex justify-between text-muted-foreground">
-              <span>Occupancy:</span>
+              <span>Occupancy ({forecastMode}):</span>
               <span className="font-mono font-medium text-foreground">
-                {hoveredSector.currentOccupancy.toLocaleString()} / {hoveredSector.capacity.toLocaleString()} ({Math.round((hoveredSector.currentOccupancy / hoveredSector.capacity) * 100)}%)
+                {getEffectiveOccupancy(hoveredSector).toLocaleString()} / {hoveredSector.capacity.toLocaleString()} ({Math.round((getEffectiveOccupancy(hoveredSector) / hoveredSector.capacity) * 100)}%)
               </span>
             </div>
+
             {"entryRate" in hoveredSector && (
-              <div className="flex justify-between text-muted-foreground">
-                <span>Entry Speed:</span>
-                <span className="font-mono font-medium text-foreground">{hoveredSector.entryRate} fans/min</span>
-              </div>
+              <>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Entry Speed:</span>
+                  <span className="font-mono font-medium text-foreground">{hoveredSector.entryRate} fans/min</span>
+                </div>
+                <div className="flex justify-between text-muted-foreground">
+                  <span>Queue ({forecastMode}):</span>
+                  <span className="font-mono font-bold text-indigo-400">{getEffectiveQueue(hoveredSector as Gate)} fans</span>
+                </div>
+              </>
             )}
-            {"queueLength" in hoveredSector && (
-              <div className="flex justify-between text-muted-foreground">
-                <span>Queue:</span>
-                <span className="font-mono font-medium text-foreground">{hoveredSector.queueLength} fans</span>
-              </div>
-            )}
+
             <p className="text-[10px] text-muted-foreground pt-1 flex items-center gap-1">
-              <Info className="h-3 w-3" /> Click to open telemetry inspection
+              <Info className="h-3 w-3" /> Click to view full 5m & 10m prediction breakdown
             </p>
           </div>
         )}

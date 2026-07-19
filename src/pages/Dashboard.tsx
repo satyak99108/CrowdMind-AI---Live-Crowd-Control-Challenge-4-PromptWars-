@@ -1,175 +1,183 @@
-import React from "react";
+import React, { useState } from "react";
 import { useCrowd } from "../contexts/CrowdContext";
 import { AppLayout } from "../components/AppLayout";
-import { StadiumMap, getStatusColor } from "../components/StadiumMap";
+import { StadiumMap } from "../components/StadiumMap";
 import { SimController } from "../components/SimController";
 import { LiveActivityFeed } from "../components/LiveActivityFeed";
 import { ZoneDetailModal } from "../components/ZoneDetailModal";
-import { Users, AlertTriangle, Flame, Activity, Clock } from "lucide-react";
+import { PredictiveForecastBar } from "../components/PredictiveForecastBar";
+import { PredictiveQueueCard } from "../components/PredictiveQueueCard";
+import { RecommendationDeck } from "../components/RecommendationDeck";
+import { Users, AlertTriangle, TrendingUp, Zap, Sparkles, Layers, Activity } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { cn } from "../lib/utils";
 
 export default function Dashboard() {
-  const { stadiumData, simState, setSelectedItem } = useCrowd();
+  const { stadiumData, setSelectedItem, recommendations } = useCrowd();
+  const [activeTab, setActiveTab] = useState<"heatmap" | "recommendations" | "forecasts">("heatmap");
 
   const totalStadiumFans = stadiumData.gates.reduce((sum, g) => sum + g.currentOccupancy, 0);
   const totalPercent = Math.round((totalStadiumFans / stadiumData.totalCapacity) * 100);
-  const attendanceStatus: "low" | "moderate" | "high" = totalPercent >= 80 ? "high" : totalPercent >= 50 ? "moderate" : "low";
-
   const congestedGatesCount = stadiumData.gates.filter((g) => g.status === "high").length;
-  const gateStatus: "low" | "moderate" | "high" = congestedGatesCount >= 4 ? "high" : congestedGatesCount >= 2 ? "moderate" : "low";
 
   const allItems = [...stadiumData.gates, ...stadiumData.sectors];
-  const maxDensityItem = allItems.reduce((max, cur) => {
-    const curRatio = cur.currentOccupancy / cur.capacity;
-    const maxRatio = max.currentOccupancy / max.capacity;
-    return curRatio > maxRatio ? cur : max;
+  const highestDensityItem = allItems.reduce((prev, current) => {
+    const prevRatio = prev.currentOccupancy / prev.capacity;
+    const currentRatio = current.currentOccupancy / current.capacity;
+    return currentRatio > prevRatio ? current : prev;
   }, allItems[0]);
 
-  const maxDensityRatio = Math.round((maxDensityItem.currentOccupancy / maxDensityItem.capacity) * 100);
-  const peakStatus: "low" | "moderate" | "high" = maxDensityRatio >= 80 ? "high" : maxDensityRatio >= 50 ? "moderate" : "low";
-
+  const peakPercent = Math.round((highestDensityItem.currentOccupancy / highestDensityItem.capacity) * 100);
   const totalInflowRate = stadiumData.gates.reduce((sum, g) => sum + g.entryRate, 0);
-  const inflowStatus: "low" | "moderate" | "high" = totalInflowRate >= 1600 ? "high" : totalInflowRate >= 1000 ? "moderate" : "low";
+  const activeRecsCount = recommendations.filter((r) => r.status === "active").length;
 
   return (
     <AppLayout>
-      <div className="flex flex-col h-full">
-        {/* Top Header Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between px-4 md:px-6 py-2.5 border-b border-border bg-card shrink-0 gap-2">
+      <div className="flex flex-col h-full space-y-5 p-4 md:p-6 max-w-[1600px] mx-auto w-full">
+        {/* Minimal Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-border/60 pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold tracking-tight">{stadiumData.stadiumName}</h1>
-              <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-muted text-muted-foreground">
+              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-ping" />
+              <h1 className="text-base font-bold tracking-tight">{stadiumData.stadiumName}</h1>
+              <span className="text-[10px] font-mono text-muted-foreground border border-border px-1.5 py-0.5 rounded">
                 {stadiumData.venueCode}
               </span>
             </div>
-            <p className="text-[11px] text-muted-foreground font-mono">
+            <p className="text-[11px] text-muted-foreground mt-0.5">
               {stadiumData.matchInfo.teams} — <span className="text-primary font-semibold">{stadiumData.matchInfo.stage}</span> ({stadiumData.matchInfo.kickoffTime})
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-1.5 text-xs font-mono bg-muted/40 px-2.5 py-1 rounded border border-border">
-              <Clock className="h-3.5 w-3.5 text-primary" />
-              <span>Sim Minute: <strong>{simState.matchMinute}'</strong></span>
-            </div>
-            <span className="inline-flex items-center gap-1.5 text-[11px] font-mono px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping" />
-              TELEMETRY STREAMING
-            </span>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setSelectedItem(stadiumData.gates[0])}
+              className="h-8 text-[12px] gap-1.5 border-border/60"
+            >
+              <Users className="h-3.5 w-3.5" /> Inspect Gates
+            </Button>
           </div>
         </div>
 
-        {/* Main Content Area */}
-        <div className="flex-1 overflow-auto p-4 md:p-6 space-y-6 max-w-[1600px] mx-auto w-full">
-          {/* KPI Stat Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-border rounded-lg overflow-hidden shadow-sm">
-            <div className="bg-background p-4 flex flex-col justify-between space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] text-muted-foreground font-medium">Total Attendance</span>
-                <Users className="h-4 w-4" style={{ color: getStatusColor(attendanceStatus) }} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-mono">{totalStadiumFans.toLocaleString()}</p>
-                <div className="w-full bg-muted h-1.5 rounded-full mt-2 overflow-hidden">
-                  <div
-                    className="h-full transition-all duration-500"
-                    style={{
-                      width: `${totalPercent}%`,
-                      backgroundColor: getStatusColor(attendanceStatus)
-                    }}
-                  />
-                </div>
-              </div>
-              <p className="text-[11px] text-muted-foreground font-mono">
-                {totalPercent}% of {stadiumData.totalCapacity.toLocaleString()} Max Capacity
-              </p>
+        {/* Minimal Stat Cards Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="border border-border/60 rounded-xl bg-card/40 backdrop-blur-md p-3.5 space-y-1.5 shadow-sm">
+            <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
+              <span>Attendance Density</span>
+              <Users className="h-3.5 w-3.5 text-primary" />
             </div>
-
-            <div className="bg-background p-4 flex flex-col justify-between space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] text-muted-foreground font-medium">Congested Gates</span>
-                <AlertTriangle className="h-4 w-4" style={{ color: getStatusColor(gateStatus) }} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-mono" style={{ color: getStatusColor(gateStatus) }}>
-                  {congestedGatesCount} / {stadiumData.gates.length} <span className="text-xs font-normal text-muted-foreground">Gates</span>
-                </p>
-              </div>
-              <p className="text-[11px] text-muted-foreground font-mono">
-                {stadiumData.gates.length - congestedGatesCount} gates running optimal inflow
-              </p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold font-mono">{totalStadiumFans.toLocaleString()}</span>
+              <span className="text-xs font-mono text-emerald-400 font-semibold">{totalPercent}%</span>
             </div>
-
-            <div className="bg-background p-4 flex flex-col justify-between space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] text-muted-foreground font-medium">Peak Density Zone</span>
-                <Flame className="h-4 w-4" style={{ color: getStatusColor(peakStatus) }} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-mono" style={{ color: getStatusColor(peakStatus) }}>
-                  {maxDensityRatio}%
-                </p>
-                <p className="text-xs font-bold truncate mt-1" style={{ color: getStatusColor(peakStatus) }}>
-                  {maxDensityItem.name}
-                </p>
-              </div>
-              <p className="text-[11px] text-muted-foreground font-mono">Highest real-time crowd saturation</p>
-            </div>
-
-            <div className="bg-background p-4 flex flex-col justify-between space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[12px] text-muted-foreground font-medium">Total Inflow Speed</span>
-                <Activity className="h-4 w-4" style={{ color: getStatusColor(inflowStatus) }} />
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-mono" style={{ color: getStatusColor(inflowStatus) }}>
-                  {totalInflowRate.toLocaleString()} <span className="text-xs font-normal text-muted-foreground">fans/min</span>
-                </p>
-              </div>
-              <p className="text-[11px] text-muted-foreground font-mono">Aggregate perimeter turnstile rate</p>
-            </div>
+            <p className="text-[10px] text-muted-foreground">
+              {totalPercent}% of {stadiumData.totalCapacity.toLocaleString()} Capacity
+            </p>
           </div>
 
-          {/* Main Workspace Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <div className="lg:col-span-7">
+          <div className="border border-border/60 rounded-xl bg-card/40 backdrop-blur-md p-3.5 space-y-1.5 shadow-sm">
+            <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
+              <span>Gate Congestion</span>
+              <AlertTriangle className="h-3.5 w-3.5 text-rose-500" />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold font-mono text-rose-400">
+                {congestedGatesCount} / {stadiumData.gates.length} <span className="text-xs font-normal text-muted-foreground">High</span>
+              </span>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              {stadiumData.gates.length - congestedGatesCount} gates optimal inflow
+            </p>
+          </div>
+
+          <div className="border border-border/60 rounded-xl bg-card/40 backdrop-blur-md p-3.5 space-y-1.5 shadow-sm">
+            <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
+              <span>Peak Zone</span>
+              <Zap className="h-3.5 w-3.5 text-amber-500" />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-base font-bold truncate text-amber-400">{highestDensityItem.name}</span>
+            </div>
+            <p className="text-[10px] font-mono text-muted-foreground">
+              {peakPercent}% Density ({highestDensityItem.currentOccupancy}/{highestDensityItem.capacity})
+            </p>
+          </div>
+
+          <div className="border border-border/60 rounded-xl bg-card/40 backdrop-blur-md p-3.5 space-y-1.5 shadow-sm">
+            <div className="flex justify-between items-center text-muted-foreground text-xs font-medium">
+              <span>Inflow Speed</span>
+              <TrendingUp className="h-3.5 w-3.5 text-sky-400" />
+            </div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-xl font-bold font-mono text-sky-400">{totalInflowRate}</span>
+              <span className="text-xs text-muted-foreground font-mono">fans/min</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground">Turnstile throughput rate</p>
+          </div>
+        </div>
+
+        {/* Minimal Predictive Time-Travel Bar */}
+        <PredictiveForecastBar />
+
+        {/* Minimal Navigation Workspace Tabs */}
+        <div className="flex items-center gap-2 border-b border-border/60 pb-1 pt-1">
+          {[
+            { id: "heatmap", label: "Stadium Heatmap & Live Ops", icon: Layers },
+            { id: "recommendations", label: "AI Recommendations", icon: Sparkles, count: activeRecsCount },
+            { id: "forecasts", label: "5–10 Min Queue Forecasts", icon: TrendingUp }
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={cn(
+                  "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all relative",
+                  isActive
+                    ? "bg-primary/10 text-primary font-bold border border-primary/20"
+                    : "text-muted-foreground hover:bg-muted/30"
+                )}
+              >
+                <tab.icon className="h-3.5 w-3.5" />
+                <span>{tab.label}</span>
+                {tab.count !== undefined && tab.count > 0 && (
+                  <span className="ml-1 text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300">
+                    {tab.count}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Tab Content Views */}
+        {activeTab === "heatmap" && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
               <StadiumMap />
             </div>
-
-            <div className="lg:col-span-5 space-y-4">
-              <div className="border border-border bg-card rounded-lg p-3 space-y-2">
-                <div className="flex items-center justify-between text-[12px] font-medium border-b border-border pb-2">
-                  <span>Perimeter Gate Occupancy Grid</span>
-                  <span className="text-[10px] text-muted-foreground font-mono">Click gate to inspect</span>
-                </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {stadiumData.gates.map((gate) => {
-                    const color = getStatusColor(gate.status);
-                    return (
-                      <div
-                        key={gate.id}
-                        onClick={() => setSelectedItem(gate)}
-                        className="p-2 border border-border rounded bg-background hover:bg-muted/40 cursor-pointer transition-all space-y-1 group"
-                      >
-                        <div className="flex items-center justify-between text-[11px] font-mono">
-                          <span className="font-bold group-hover:text-primary">{gate.id.replace("gate-", "").toUpperCase()}</span>
-                          <span className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
-                        </div>
-                        <p className="text-[13px] font-bold font-mono" style={{ color }}>
-                          {Math.round((gate.currentOccupancy / gate.capacity) * 100)}%
-                        </p>
-                        <p className="text-[10px] text-muted-foreground font-mono">{gate.entryRate} f/m</p>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
+            <div className="space-y-6">
               <SimController />
               <LiveActivityFeed />
             </div>
           </div>
-        </div>
+        )}
+
+        {activeTab === "recommendations" && (
+          <RecommendationDeck />
+        )}
+
+        {activeTab === "forecasts" && (
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              {stadiumData.gates.map((gate) => (
+                <PredictiveQueueCard key={gate.id} item={gate} />
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       <ZoneDetailModal />

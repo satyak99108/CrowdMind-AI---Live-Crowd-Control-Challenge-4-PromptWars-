@@ -1,4 +1,4 @@
-import { LayoutDashboard, Grid, AlertTriangle, BarChart3, Settings, Activity } from "lucide-react";
+import { LayoutDashboard, Grid, AlertTriangle, BarChart3, Settings, Activity, Sparkles } from "lucide-react";
 import { StackedLogo } from "./StackedLogo";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "../lib/utils";
@@ -7,6 +7,7 @@ import { useCrowd } from "../contexts/CrowdContext";
 
 export const navItems = [
   { icon: LayoutDashboard, label: "Live Telemetry", path: "/dashboard" },
+  { icon: Sparkles, label: "AI Recommendations", path: "/recommendations" },
   { icon: Grid, label: "Gates & Sectors", path: "/gates" },
   { icon: AlertTriangle, label: "Incident Triage", path: "/incidents" },
   { icon: BarChart3, label: "Analytics", path: "/analytics" },
@@ -15,10 +16,11 @@ export const navItems = [
 
 export function SidebarContent({ collapsed = false, onNavigate }: { collapsed?: boolean; onNavigate?: () => void }) {
   const location = useLocation();
-  const { incidents, simState } = useCrowd();
+  const { incidents, simState, recommendations } = useCrowd();
 
   const openIncidentsCount = incidents.filter(i => !["resolved", "closed"].includes(i.status)).length;
   const criticalCount = incidents.filter(i => i.severity === "critical" && !["resolved", "closed"].includes(i.status)).length;
+  const activeRecsCount = recommendations.filter(r => r.status === "active").length;
 
   return (
     <div className="flex flex-col h-full bg-sidebar border-r border-sidebar-border">
@@ -66,6 +68,12 @@ export function SidebarContent({ collapsed = false, onNavigate }: { collapsed?: 
             >
               <item.icon className={cn("h-4 w-4 shrink-0 transition-transform group-hover:scale-105", isActive ? "text-primary" : "text-muted-foreground")} />
               {!collapsed && <span className="flex-1 truncate">{item.label}</span>}
+
+              {!collapsed && item.path === "/recommendations" && activeRecsCount > 0 && (
+                <span className="ml-auto text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                  {activeRecsCount}
+                </span>
+              )}
 
               {!collapsed && item.path === "/incidents" && openIncidentsCount > 0 && (
                 <span className={cn(

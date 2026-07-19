@@ -1,10 +1,10 @@
 import React from "react";
-import { useCrowd, Gate, Sector } from "../contexts/CrowdContext";
+import { useCrowd, Gate, Sector, Amenity } from "../contexts/CrowdContext";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
 import { getStatusColor } from "./StadiumMap";
-import { Activity, Users, ShieldCheck, Zap, AlertTriangle } from "lucide-react";
+import { Activity, Users, ShieldCheck, Zap, AlertTriangle, TrendingUp, Sparkles } from "lucide-react";
 
 export function ZoneDetailModal() {
   const { selectedItem, setSelectedItem, injectSpike, addIncident } = useCrowd();
@@ -12,17 +12,26 @@ export function ZoneDetailModal() {
   if (!selectedItem) return null;
 
   const isGate = "entryRate" in selectedItem;
-  const occupancyPercent = Math.round((selectedItem.currentOccupancy / selectedItem.capacity) * 100);
+  const isAmenity = "currentQueue" in selectedItem && !("entryRate" in selectedItem);
+  const isSector = !isGate && !isAmenity;
+
+  const occupancy = isGate || isSector ? (selectedItem as Gate | Sector).currentOccupancy : (selectedItem as Amenity).currentQueue;
+  const capacity = selectedItem.capacity;
+  const occupancyPercent = Math.round((occupancy / capacity) * 100);
   const statusColor = getStatusColor(selectedItem.status);
+
+  const pred5m = "predictedOccupancy5m" in selectedItem ? (selectedItem as Gate | Sector).predictedOccupancy5m : (selectedItem as Amenity).predictedQueue5m;
+  const pred10m = "predictedOccupancy10m" in selectedItem ? (selectedItem as Gate | Sector).predictedOccupancy10m : (selectedItem as Amenity).predictedQueue10m;
+  const pred10mPct = Math.round((pred10m / capacity) * 100);
 
   const handleCreateIncident = () => {
     addIncident({
-      title: `High Density Investigation requested at ${selectedItem.name}`,
+      title: `High Density Surge Alert requested at ${selectedItem.name}`,
       location: selectedItem.name,
-      severity: occupancyPercent >= 85 ? "critical" : occupancyPercent >= 60 ? "high" : "medium",
+      severity: pred10mPct >= 85 ? "critical" : pred10mPct >= 60 ? "high" : "medium",
       status: "new",
-      description: `Manual telemetry inspection reported ${occupancyPercent}% occupancy (${selectedItem.currentOccupancy}/${selectedItem.capacity}).`,
-      recommendedAction: "Dispatch field supervisor to verify fan flow and open secondary aisles."
+      description: `Telemetry inspection & 10m forecast reports ${occupancyPercent}% now → ${pred10mPct}% predicted in 10 minutes (${pred10m}/${capacity}).`,
+      recommendedAction: "Dispatch field supervisor to verify fan flow and prepare overflow gates."
     });
     setSelectedItem(null);
   };
@@ -36,11 +45,12 @@ export function ZoneDetailModal() {
             <DialogTitle className="text-base font-bold">{selectedItem.name}</DialogTitle>
           </div>
           <DialogDescription className="text-xs text-muted-foreground font-mono">
-            ID: {selectedItem.id} | TYPE: {isGate ? "Perimeter Gate" : "Stadium Seating Sector"}
+            ID: {selectedItem.id} | TYPE: {isGate ? "Perimeter Gate" : isAmenity ? "Stadium Amenity" : "Seating Sector"}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-2">
+          {/* Current Occupancy Density */}
           <div className="space-y-1.5">
             <div className="flex justify-between text-xs font-medium">
               <span>Current Occupancy Density</span>
@@ -50,9 +60,46 @@ export function ZoneDetailModal() {
             </div>
             <Progress value={occupancyPercent} className="h-2" />
             <div className="flex justify-between text-[11px] text-muted-foreground font-mono">
-              <span>{selectedItem.currentOccupancy.toLocaleString()} active fans</span>
-              <span>{selectedItem.capacity.toLocaleString()} max capacity</span>
+              <span>{occupancy.toLocaleString()} active fans</span>
+              <span>{capacity.toLocaleString()} max capacity</span>
             </div>
+          </div>
+
+          {/* AI 5-10 Minute Prediction Card */}
+          <div className="p-3 border border-indigo-500/30 rounded-lg bg-indigo-500/5 space-y-2 text-xs">
+            <div className="flex items-center justify-between text-indigo-400 font-bold font-mono">
+              <span className="flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5" /> AI Predictive Telemetry
+              </span>
+              <span className="text-[10px] text-indigo-300">5–10 MIN FORECAST</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 text-center pt-1 font-mono">
+              <div className="bg-background/80 p-2 rounded border border-border">
+                <span className="text-[10px] text-muted-foreground block">NOW</span>
+                <span className="font-bold text-foreground">{occupancy.toLocaleString()}</span>
+                <span className="text-[10px] text-muted-foreground block">({occupancyPercent}%)</span>
+              </div>
+              <div className="bg-background/80 p-2 rounded border border-indigo-500/30">
+                <span className="text-[10px] text-indigo-400 block">+5 MIN</span>
+                <span className="font-bold text-indigo-300">{pred5m.toLocaleString()}</span>
+                <span className="text-[10px] text-indigo-300 block">({Math.round((pred5m / capacity) * 100)}%)</span>
+              </div>
+              <div className="bg-background/80 p-2 rounded border border-rose-500/30">
+                <span className="text-[10px] text-rose-400 block">+10 MIN</span>
+                <span className="font-bold text-rose-300">{pred10m.toLocaleString()}</span>
+                <span className="text-[10px] text-rose-300 block">({pred10mPct}%)</span>
+              </div>
+            </div>
+
+            {isGate && (
+              <div className="text-[11px] text-muted-foreground font-mono pt-1 flex justify-between">
+                <span>Predicted Queue:</span>
+                <span className="font-bold text-foreground">
+                  {(selectedItem as Gate).queueLength}q → {(selectedItem as Gate).predictedQueue5m}q (+5m) → {(selectedItem as Gate).predictedQueue10m}q (+10m)
+                </span>
+              </div>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
@@ -60,7 +107,7 @@ export function ZoneDetailModal() {
               <>
                 <div className="p-3 border rounded-md bg-muted/20 space-y-1">
                   <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <Activity className="h-3 w-3" /> Entry Rate
+                    <Activity className="h-3 w-3" /> Inflow Rate
                   </span>
                   <p className="text-base font-bold font-mono">{(selectedItem as Gate).entryRate} <span className="text-[10px] font-normal text-muted-foreground">fans/min</span></p>
                 </div>
@@ -69,23 +116,6 @@ export function ZoneDetailModal() {
                     <Users className="h-3 w-3" /> Queue Backlog
                   </span>
                   <p className="text-base font-bold font-mono">{(selectedItem as Gate).queueLength} <span className="text-[10px] font-normal text-muted-foreground">in line</span></p>
-                </div>
-              </>
-            )}
-
-            {!isGate && (
-              <>
-                <div className="p-3 border rounded-md bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <Users className="h-3 w-3" /> Category
-                  </span>
-                  <p className="text-sm font-bold">{(selectedItem as Sector).category}</p>
-                </div>
-                <div className="p-3 border rounded-md bg-muted/20 space-y-1">
-                  <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                    <ShieldCheck className="h-3 w-3" /> Density Index
-                  </span>
-                  <p className="text-sm font-bold font-mono">{(selectedItem as Sector).density}</p>
                 </div>
               </>
             )}
@@ -102,7 +132,7 @@ export function ZoneDetailModal() {
                 }}
                 className="flex-1 text-[12px] gap-1.5 border-rose-500/40 text-rose-400 hover:bg-rose-500/10"
               >
-                <Zap className="h-3.5 w-3.5" /> Inject Spike
+                <Zap className="h-3.5 w-3.5" /> Inject Bottleneck Spike
               </Button>
             )}
             <Button
@@ -111,7 +141,7 @@ export function ZoneDetailModal() {
               onClick={handleCreateIncident}
               className="flex-1 text-[12px] gap-1.5"
             >
-              <AlertTriangle className="h-3.5 w-3.5" /> Create Incident Alert
+              <AlertTriangle className="h-3.5 w-3.5" /> Log Incident Alert
             </Button>
           </div>
         </div>

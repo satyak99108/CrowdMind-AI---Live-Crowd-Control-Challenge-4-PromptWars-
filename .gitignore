@@ -1,3 +1,12 @@
+# External Dependencies & Packages
+node_modules/
+jspm_packages/
+web_modules/
+.npm/
+.yarn/
+.yarn-integrity
+*.tgz
+
 # Logs
 logs
 *.log
@@ -5,18 +14,22 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+lerna-debug.log*
 
-# Dependency directories
-node_modules/
+# Diagnostic reports
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
-# Production build output
+# Production build outputs
 dist/
 dist-ssr/
 build/
+out/
 
-# TypeScript build cache
+# TypeScript build cache & lint caches
 *.tsbuildinfo
 .tscache
+.eslintcache
+.stylelintcache
 
 # Environment variables & secret files
 .env
@@ -26,18 +39,26 @@ build/
 .env.production.local
 *.env
 
-# IDE / Editor configuration
+# IDE & Editor configuration
 .vscode/*
 !.vscode/extensions.json
 .idea/
 *.suo
+*.ntvs*
+*.njsproj
+*.sln
 *.sw?
 
 # OS generated files
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
-# Temporary directories & internal docs
+# Temporary scratch directories & local lock docs
 CrowdMind_AI_Fan_MVP_Roadmap.docx
 ~$owdMind_AI_Fan_MVP_Roadmap.docx
 temp_*
